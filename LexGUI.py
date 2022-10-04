@@ -185,6 +185,9 @@ def getTextInput(cadena, tokens):
                         tipo_token.append("Var Cadena")
                     elif(token == "@BULL"):
                         tipo_token.append("Var Booleana")
+                #Para detectar una función
+                elif(token[0] == "~"):
+                    print("Para función")
             #Detectando tipo de operador
                 if(cadena[0] == "*"):
                     if(not token in operadoresA):
