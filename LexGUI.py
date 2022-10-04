@@ -73,19 +73,14 @@ def AnalisisSintactico():
                                 break
                     else:
                         print("Error de sintáxis, se esperaba ':' en", tokens[indice-1])
-                    #if(tokens[indice] == "FINATRIBUTOS_" and tipo_token[indice] == "Built-In Word"):
-                        #indice+=1
-                        #print("Indice: ", indice)
-                        #Aquí se bifurca, lo siguiente puede ser declaración de funciones o el programa principal
-                        #if(tokens[indice] == "DEFFUNCS" and tipo_token[indice] == "Built-In Word"):
-                            #indice+=1
+                #En caso de que se vaya directamente a la definición de funciones
+                elif(tokens[indice] == "DEFFUNCS" and tipo_token[indice] == "Built-In Word"):
+                    indice+=1
+                #En caso de que se vaya a principal
+                elif(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
+                    indice+=1
                 else:
                     print("Error de sintáxis, se esperaba declaración de atributos, funciones o principal")
-                #En caso de que se vaya directamente a la definición de funciones
-                #if(tokens[indice] == "DEFFUNCS" and tipo_token[indice] == "Built-In Word"):
-                    #indice+=1
-                #if(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
-                    #indice+=1
             else:
                 print("Error de sintáxis, se esperaba ':' en", tokens[indice-2], tokens[indice-1])
         else:
