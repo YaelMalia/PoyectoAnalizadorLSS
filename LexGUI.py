@@ -12,12 +12,13 @@ operadoresA = ["*MAS","*MENOS","*MULT","*DIV"]
 operadoresRL = ["=ESMAYOR","=ESMENOR","=ESIGUAL","=NOIGUAL","=AND","=OR"]
 builtIn = ["CLASE", "HASTAAQUILAVAMOSADEJAR_", "ATRIBUTOS", "FINATRIBUTOS_",
             "DEFFUNCS", "FINDEFFUNCS_", "ESCRIBIDO", "RECIBIDO", "ITERAR", "FINITERAR_",
-            "SI", "JALO", "FINJALO_", "NOJALO", "FINNOJALO_", "FINSI_", "PRINCIPAL", "FINPRINCIPAL_"]
+            "SI", "JALO", "FINJALO_", "NOJALO", "FINNOJALO_", "FINSI_", "PRINCIPAL", "FINPRINCIPAL_", "FUNC", "FINFUNC_", "ENT", "CAD", "BULL"]
 tiposD = ["@ENT","@CAD","@BULL"]
 
 tokens = []
 tipo_token = []
 lista_variables = []
+lista_funciones = []
 #Parte lógica______________________
 def cerrarF():
     root.destroy()
@@ -71,11 +72,67 @@ def AnalisisSintactico():
                             else:
                                 print("Error de sintáxis, se esperaba el tipo de variable")
                                 break
+                        indice+=1
                     else:
                         print("Error de sintáxis, se esperaba ':' en", tokens[indice-1])
                 #En caso de que se vaya directamente a la definición de funciones
-                elif(tokens[indice] == "DEFFUNCS" and tipo_token[indice] == "Built-In Word"):
+                if(tokens[indice] == "DEFFUNCS" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
+                    if(tokens[indice] == ":"):
+                        indice+=1
+                        #Aquí se analiza que se tenga la estructura de una función declarada
+                        while(tokens[indice]!="FINDEFFUNCS_"):
+                            if(tokens[indice] == "~"):
+                                indice+=1
+                                if((tipo_token[indice] == "Built-In Word") and (tokens[indice] == "FUNC")):
+                                    indice+=1
+                                    if((tipo_token[indice] == "Built-In Word") and (tokens[indice] == "ENT" or tokens[indice] == "CAD" or tokens[indice] == "BULL")):
+                                        indice+=1
+                                        if(tipo_token[indice] == "Nombre de método o clase"):
+                                            indice+=1
+                                            if(tokens[indice] == "("):
+                                                indice+=1
+                                                #Leér tantos parámetros recibidos por la función (también se analiza la estructura de los argumentos)
+                                                while(tokens[indice]!=")"):
+                                                    if((tokens[indice] == "@ENT") or (tokens[indice] == "@CAD") or (tokens[indice] == "@BULL")):
+                                                        indice+=1
+                                                        if(tipo_token[indice] == "Var"):
+                                                            indice+=1
+                                                            if(tokens[indice] == ","):
+                                                                indice+=1
+                                                            elif(tokens[indice] == ")"):
+                                                                indice+=1
+                                                                break
+                                                            else:
+                                                                print("Error sintáctico, se esperaba ','")
+                                                                break
+                                                        else:
+                                                            print("Error sintáctico, se esperaba una variable")
+                                                            break
+                                                    else:
+                                                        print("Error sintáctico, se esperaba el tipo de dato para el argumento recibido", tokens[indice])
+                                                        break
+                                                indice+=1
+                                                if(tokens[indice] == "?"):
+                                                    indice+=1
+                                                else:
+                                                    print("Error sintáctico, se esperaba '?' en", tokens[indice-3], tokens[indice-2], tokens[indice-1])
+                                                    break
+                                            else:
+                                                print("Error sintáctico, se esperaba '(' en", tokens[indice-4], tokens[indice-3], tokens[indice-2], tokens[indice-1])
+                                                break
+                                        else:
+                                            print("Error sintáctico, se esperaba nombre del método")
+                                    else:
+                                        print("Error sintáctico, se esperaba el tipo de dato para la función")
+                                        break
+                                else:
+                                    print("Error sintáctico, se esperaba palabra reservada FUNC")
+                                    break
+                            else:
+                                print("Error sintáctico, se esperaba inicio de declaración de una función '~'")
+                                break
+                        indice+=1   
                 #En caso de que se vaya a principal
                 elif(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
@@ -185,9 +242,6 @@ def getTextInput(cadena, tokens):
                         tipo_token.append("Var Cadena")
                     elif(token == "@BULL"):
                         tipo_token.append("Var Booleana")
-                #Para detectar una función
-                elif(token[0] == "~"):
-                    print("Para función")
             #Detectando tipo de operador
                 if(cadena[0] == "*"):
                     if(not token in operadoresA):
