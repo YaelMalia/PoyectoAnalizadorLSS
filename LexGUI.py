@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter
 from tkinter.tix import Tree
+from tkinter import messagebox 
 #Tokinzador variables______________________
 specialL = [":",",","(",")","?","*","=","$","@","~","\"","'","“","”"," ","\n"]
 operadoresA = ["*MAS","*MENOS","*MULT","*DIV"]
@@ -25,11 +26,14 @@ def cerrarF():
 
 def AnalisisSintactico():
     banderaErrorSintactico = False
+    #----------------------------PRUEBA DE COLORES----------------------------
+
     #Examinar estructura inicial-----
     #Primero deberá de tener la palabra reservada CLASE y nombre de la clase, seguido de un ":"
     indice = 0
     if(tokens[indice] == "CLASE" and tipo_token[indice] == "Built-In Word"):
         indice+=1
+        textoComentario.config(fg="green")
         if(tipo_token[indice] == "Nombre de método o clase"):
             indice+=1
             if(tokens[indice] == ":"):
@@ -49,12 +53,18 @@ def AnalisisSintactico():
                                     Vari = tokens[indice]
                                     #Si hay un carácter especial dentro del nombre de la variable, se envía un error de sintáxis
                                     for posi in range(len(Vari)):
-                                        if((Vari[posi] in specialL) or (Vari[posi] in operadoresA) or (Vari[posi] in operadoresRL) or (Vari[posi] in builtIn) or ((Vari[posi] in tiposD))):
+                                        if((Vari[posi] in specialL)):
                                             banderaErrorSintactico = True
                                             print(Vari[posi])
                                             break
-                                    if(banderaErrorSintactico == True):
-                                        print("Error de sintáxis, la variable contiene palabras o carácteres no válidos")
+                                        if(banderaErrorSintactico == True):
+                                            #print("Error de sintáxis, la variable contiene palabras o carácteres no válidos")
+                                            messagebox.showerror("Error",f"Error de sintáxis, la variable contiene palabras o carácteres no válidos")
+                                            break
+                                        elif((tokens[indice] in operadoresA) or (tokens[indice] in operadoresRL) or (tokens[indice] in builtIn) or ((tokens[indice] in tiposD))):
+                                            #print("Error de sintáxis, la variable contiene palabras o carácteres no válidos")
+                                            messagebox.showerror("Error",f"Error de sintáxis, la variable contiene palabras o carácteres no válidos")
+                                            break
                                     else:
                                         #El nombre de la variable es correcto, se añade a la lista de variables
                                         lista_variables.append(tokens[indice])
@@ -64,17 +74,21 @@ def AnalisisSintactico():
                                         #La estructura para declarar una variable es correcta, se continúa leyendo
                                         
                                     else:
-                                        print("Error de sintáxis, se esperaba '?' en", tokens[indice-2], tokens[indice-1])
+                                        #print("Error de sintáxis, se esperaba '?' en", tokens[indice-2], tokens[indice-1])
+                                        messagebox.showerror("Error",f"Error de sintáxis, se esperaba '?' en, {tokens[indice-2]}, {tokens[indice-1]}")
                                         break
                                 else:
-                                    print("Error de sintáxis, se esperaba una variable")
+                                    #print("Error de sintáxis, se esperaba una variable")
+                                    messagebox.showerror("Error",f"Error de sintáxis, se esperaba una variable")
                                     break
                             else:
-                                print("Error de sintáxis, se esperaba el tipo de variable")
+                                #print("Error de sintáxis, se esperaba el tipo de variable")
+                                messagebox.showerror("Error",f"Error de sintáxis, se esperaba el tipo de variable")
                                 break
                         indice+=1
                     else:
-                        print("Error de sintáxis, se esperaba ':' en", tokens[indice-1])
+                        #print("Error de sintáxis, se esperaba ':' en", tokens[indice-1])
+                        messagebox.showerror("Error",f"Error de sintáxis, se esperaba ':' en, {tokens[indice-1]}")
                 #En caso de que se vaya directamente a la definición de funciones
                 if(tokens[indice] == "DEFFUNCS" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
@@ -104,46 +118,59 @@ def AnalisisSintactico():
                                                                 indice+=1
                                                                 break
                                                             else:
-                                                                print("Error sintáctico, se esperaba ','")
+                                                                #print("Error sintáctico, se esperaba ','")
+                                                                messagebox.showerror("Error",f"Error sintáctico, se esperaba ','")
                                                                 break
                                                         else:
-                                                            print("Error sintáctico, se esperaba una variable")
+                                                            #print("Error sintáctico, se esperaba una variable")
+                                                            messagebox.showerror("Error",f"Error sintáctico, se esperaba una variable")
                                                             break
                                                     else:
-                                                        print("Error sintáctico, se esperaba el tipo de dato para el argumento recibido", tokens[indice])
+                                                        #print("Error sintáctico, se esperaba el tipo de dato para el argumento recibido", tokens[indice])
+                                                        messagebox.showerror("Error",f"Error sintáctico, se esperaba el tipo de dato para el argumento recibido, {tokens[indice]}")
                                                         break
                                                 indice+=1
                                                 if(tokens[indice] == "?"):
                                                     indice+=1
                                                 else:
-                                                    print("Error sintáctico, se esperaba '?' en", tokens[indice-3], tokens[indice-2], tokens[indice-1])
+                                                    #print("Error sintáctico, se esperaba '?' en", tokens[indice-3], tokens[indice-2], tokens[indice-1])
+                                                    messagebox.showerror("Error",f"Error sintáctico, se esperaba '?' en, {tokens[indice-3]}, {tokens[indice-2]}, {tokens[indice-1]}")
                                                     break
                                             else:
-                                                print("Error sintáctico, se esperaba '(' en", tokens[indice-4], tokens[indice-3], tokens[indice-2], tokens[indice-1])
+                                                #print("Error sintáctico, se esperaba '(' en", tokens[indice-4], tokens[indice-3], tokens[indice-2], tokens[indice-1])
+                                                messagebox.showerror("Error",f"Error sintáctico, se esperaba '(' en, {tokens[indice-4]}, {tokens[indice-3]}, {tokens[indice-2]}, {tokens[indice-1]}")
                                                 break
                                         else:
-                                            print("Error sintáctico, se esperaba nombre del método")
+                                            #print("Error sintáctico, se esperaba nombre del método")
+                                            messagebox.showerror("Error",f"Error sintáctico, se esperaba nombre del método")
                                     else:
-                                        print("Error sintáctico, se esperaba el tipo de dato para la función")
+                                        #print("Error sintáctico, se esperaba el tipo de dato para la función")
+                                        messagebox.showerror("Error",f"Error sintáctico, se esperaba el tipo de dato para la función")
                                         break
                                 else:
-                                    print("Error sintáctico, se esperaba palabra reservada FUNC")
+                                    #print("Error sintáctico, se esperaba palabra reservada FUNC")
+                                    messagebox.showerror("Error",f"Error sintáctico, se esperaba palabra reservada FUNC")
                                     break
                             else:
-                                print("Error sintáctico, se esperaba inicio de declaración de una función '~'")
+                                #print("Error sintáctico, se esperaba inicio de declaración de una función '~'")
+                                messagebox.showerror("Error",f"Error sintáctico, se esperaba inicio de declaración de una función '~'")
                                 break
                         indice+=1   
                 #En caso de que se vaya a principal
                 elif(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
                 else:
-                    print("Error de sintáxis, se esperaba declaración de atributos, funciones o principal")
+                    #print("Error de sintáxis, se esperaba declaración de atributos, funciones o principal")
+                    messagebox.showerror("Error",f"Error de sintáxis, se esperaba declaración de atributos, funciones o principal")
             else:
-                print("Error de sintáxis, se esperaba ':' en", tokens[indice-2], tokens[indice-1])
+                #print("Error de sintáxis, se esperaba ':' en", tokens[indice-2], tokens[indice-1])
+                 messagebox.showerror("Error",f"Error de sintáxis, se esperaba ':' en, {tokens[indice-2]}, {tokens[indice-1]}")
         else:
-            print("Error de sintáxis, palabra reservada no puede ser nombre de una clase en", tokens[indice-1], tokens[indice], tokens[indice+1])
+            #print("Error de sintáxis, palabra reservada no puede ser nombre de una clase en", tokens[indice-1], tokens[indice], tokens[indice+1])
+            messagebox.showerror("Error",f"Error de sintáxis, se esperaba palabra reservada 'CLASE' en {tokens[indice]}")
     else:
-        print("Error de sintáxis, se esperaba palabra reservada 'CLASE' en", tokens[indice])
+        #print("Error de sintáxis, se esperaba palabra reservada 'CLASE' en", tokens[indice])
+        messagebox.showerror("Error",f"Error de sintáxis, palabra reservada no puede ser nombre de una clase en {tokens[indice-1]}, {tokens[indice]}, {tokens[indice+1]}")
     print(lista_variables)
     return 0
 
@@ -282,8 +309,9 @@ def getTextInput(cadena, tokens):
 
         if(token != ""):
             tokens.append(token)
+   
     AnalisisSintactico()
-    
+
 #---------------------------------------------------------------------------------------------------------
     for items in range(len(tokens)):
         tree.insert('', tkinter.END, values=(items,tokens[items], tipo_token[items]))
@@ -312,11 +340,11 @@ scrollVert=Scrollbar(Frame1, command=textoComentario.yview)
 scrollVert.grid(row=1,column=1, sticky="nsew")
 textoComentario.config(yscrollcommand=scrollVert.set)
 #Botones play______________________
-add=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\play.png")
+add=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T2\\PoyectoAnalizadorLSS-main\\play.png")
 botonañadir=Button(Frame1, image=add, width=24, height=24, command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
 botonañadir.place(relx=0.9, rely=0.028, anchor=CENTER)
 #Botones cerrar______________________
-cerrar=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\cerrar.png")
+cerrar=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T2\\PoyectoAnalizadorLSS-main\\cerrar.png")
 btncerrar=Button(Frame1, image=add, width=24, height=24,command=cerrarF)
 btncerrar.place(relx=0.978, rely=0.028, anchor=CENTER)
 #Creación de tabla______________________
@@ -330,5 +358,8 @@ tree.grid(row=3, column=0)
 scrollbar = ttk.Scrollbar(Frame1, orient=tkinter.VERTICAL, command=tree.yview)
 tree.configure(yscroll=scrollbar.set)
 scrollbar.grid(row=3, column=1, sticky='ns')
+
+
+
 
 root.mainloop()
