@@ -1,11 +1,6 @@
-
-from distutils.cmd import Command
-from lib2to3.pgen2 import token
-from re import I
 from tkinter import *
 from tkinter import ttk
 import tkinter
-from tkinter.tix import Tree
 from tkinter import messagebox 
 #Tokinzador variables______________________
 specialL = [":",",","(",")","?","*","=","$","@","~","\"","'","“","”"," ","\n"]
@@ -25,6 +20,12 @@ def cerrarF():
     root.destroy()
 
 def AnalisisSintactico():
+
+    #for ind in range (len(tokens)):
+     #   if(tokens[ind] in builtIn):
+      #      textoComentario = tokens[ind]
+       #     textoComentario = str.config(fg="green")
+            
     banderaErrorSintactico = False
     #----------------------------PRUEBA DE COLORES----------------------------
 
@@ -33,7 +34,6 @@ def AnalisisSintactico():
     indice = 0
     if(tokens[indice] == "CLASE" and tipo_token[indice] == "Built-In Word"):
         indice+=1
-        textoComentario.config(fg="green")
         if(tipo_token[indice] == "Nombre de método o clase"):
             indice+=1
             if(tokens[indice] == ":"):
@@ -115,7 +115,6 @@ def AnalisisSintactico():
                                                             if(tokens[indice] == ","):
                                                                 indice+=1
                                                             elif(tokens[indice] == ")"):
-                                                                indice+=1
                                                                 break
                                                             else:
                                                                 #print("Error sintáctico, se esperaba ','")
@@ -340,11 +339,11 @@ scrollVert=Scrollbar(Frame1, command=textoComentario.yview)
 scrollVert.grid(row=1,column=1, sticky="nsew")
 textoComentario.config(yscrollcommand=scrollVert.set)
 #Botones play______________________
-add=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T2\\PoyectoAnalizadorLSS-main\\play.png")
+add=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\play.png")
 botonañadir=Button(Frame1, image=add, width=24, height=24, command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
 botonañadir.place(relx=0.9, rely=0.028, anchor=CENTER)
 #Botones cerrar______________________
-cerrar=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T2\\PoyectoAnalizadorLSS-main\\cerrar.png")
+cerrar=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\cerrar.png")
 btncerrar=Button(Frame1, image=add, width=24, height=24,command=cerrarF)
 btncerrar.place(relx=0.978, rely=0.028, anchor=CENTER)
 #Creación de tabla______________________
