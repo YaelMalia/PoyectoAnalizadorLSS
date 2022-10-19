@@ -1,4 +1,4 @@
-
+from hashlib import new
 from re import I
 from tkinter import *
 from tkinter import ttk
@@ -21,7 +21,7 @@ lista_funciones = []
 def cerrarF():
     root.destroy()
 
-def AnalisisSintactico():
+def AnalisisSintactico(text):
 
     #for ind in range (len(tokens)):
      #   if(tokens[ind] in builtIn):
@@ -157,13 +157,15 @@ def AnalisisSintactico():
                                 messagebox.showerror("Error",f"Error sintáctico, se esperaba inicio de declaración de una función '~'")
                                 break
                         indice+=1   
-                #En caso de que se vaya a principal
+                #EN CASO DE QUE SE VAYA A PRINCIPAL#
+                #------------------------------------------------#
+                #--------------SECCIÓN PRINCIPAL-----------------#
+                #------------------------------------------------#
                 if(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
                     if(tokens[indice] == ":"):
                         indice+=1
                         #Todo código lógico aquí (Inicio del apartado principal) --->
-
                         #ESCRIBIDO
                         if(tokens[indice] == "ESCRIBIDO" and tipo_token[indice] == "Built-In Word"):
                             indice+=1
@@ -193,8 +195,22 @@ def AnalisisSintactico():
     return 0
 
 def getTextInput(cadena, tokens):
-    bandera = True
+    newWindow = Toplevel(root)
+    newWindow.title("Tabla de tokens")
+    newWindow.config(background="#334856")
+    newWindow.geometry(f"{700}x{300}+{200}+{30}")
+    #Creación de tabla______________________
+    columns = ('Num', 'Token', 'ID')
+    tree = ttk.Treeview(newWindow, columns=columns, show='headings')
+    tree.heading('Num', text='Num')
+    tree.heading('Token', text='Token')
+    tree.heading('ID', text='ID_String')
 
+    tree.grid(row=3, column=0)
+    scrollbar = ttk.Scrollbar(newWindow, orient=tkinter.VERTICAL, command=tree.yview)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.grid(row=3, column=1, sticky='ns')
+    bandera = True
     while(len(cadena) > 0 and bandera == True):
         token = ""       
         #primer caracter es númerico
@@ -328,19 +344,16 @@ def getTextInput(cadena, tokens):
         if(token != ""):
             tokens.append(token)
    
-    AnalisisSintactico()
-
+    #AnalisisSintactico()
 #---------------------------------------------------------------------------------------------------------
     for items in range(len(tokens)):
         tree.insert('', tkinter.END, values=(items,tokens[items], tipo_token[items]))
-        
-    #result=textoComentario.get("1.0","end")
-    #print(result)
 
 #Creación de la raíz______________________
 root=Tk()
 root.config(background="#26292b")
-root.overrideredirect(1)
+root.title("TEAM CODE")
+root.overrideredirect(0)
 root.geometry(f"{750}x{650}+{200}+{30}")
 #Creación de Frame______________________
 Frame1=Frame(root, background="#26292b")
@@ -358,26 +371,20 @@ scrollVert=Scrollbar(Frame1, command=textoComentario.yview)
 scrollVert.grid(row=1,column=1, sticky="nsew")
 textoComentario.config(yscrollcommand=scrollVert.set)
 #Botones play______________________
-add=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\play.png")
-botonañadir=Button(Frame1, image=add, width=24, height=24, command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
+add=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T3\\PoyectoAnalizadorLSS-main\\play.png")
+botonañadir=Button(Frame1, image=add, width=24, height=24, command=lambda:AnalisisSintactico(textoComentario.get("1.0","end")))
 botonañadir.place(relx=0.9, rely=0.028, anchor=CENTER)
 #Botones cerrar______________________
-cerrar=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\cerrar.png")
+cerrar=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T3\\PoyectoAnalizadorLSS-main\\cerrar.png")
 btncerrar=Button(Frame1, image=add, width=24, height=24,command=cerrarF)
 btncerrar.place(relx=0.978, rely=0.028, anchor=CENTER)
-#Creación de tabla______________________
-columns = ('Num', 'Token', 'ID')
-tree = ttk.Treeview(Frame1, columns=columns, show='headings')
-tree.heading('Num', text='Num')
-tree.heading('Token', text='Token')
-tree.heading('ID', text='ID_String')
 
-tree.grid(row=3, column=0)
-scrollbar = ttk.Scrollbar(Frame1, orient=tkinter.VERTICAL, command=tree.yview)
-tree.configure(yscroll=scrollbar.set)
-scrollbar.grid(row=3, column=1, sticky='ns')
-
-
-
+#-----------------Barra menú--------------------#
+barraMenu=Menu(root)
+root.config(menu=barraMenu, width=300, height=300)
+MenuLSS=Menu(barraMenu, tearoff=0)
+MenuLSS.add_command(label="Tabla de tokens", command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
+MenuLSS.add_command(label="Tabla de variables")
+barraMenu.add_cascade(label="Tablas", menu=MenuLSS)
 
 root.mainloop()
