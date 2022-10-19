@@ -1,3 +1,5 @@
+
+from re import I
 from tkinter import *
 from tkinter import ttk
 import tkinter
@@ -156,8 +158,25 @@ def AnalisisSintactico():
                                 break
                         indice+=1   
                 #En caso de que se vaya a principal
-                elif(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
+                if(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
+                    if(tokens[indice] == ":"):
+                        indice+=1
+                        #Todo código lógico aquí (Inicio del apartado principal) --->
+
+                        #ESCRIBIDO
+                        if(tokens[indice] == "ESCRIBIDO" and tipo_token[indice] == "Built-In Word"):
+                            indice+=1
+                            if(tokens[indice] == "("):
+                                indice+=1
+                                while(tokens[indice]!=")"):
+                                    if(tipo_token[indice] == "Cadena" or tipo_token[indice] == "Var"):
+                                        indice+=1
+                                    if(tokens[indice] == "+"):
+                                        indice+=1
+
+                    else:
+                        messagebox.showerror("Error",f"Error de sintáxis, se esperaba ':' en, {tokens[indice-1]}, {tokens[indice]}")
                 else:
                     #print("Error de sintáxis, se esperaba declaración de atributos, funciones o principal")
                     messagebox.showerror("Error",f"Error de sintáxis, se esperaba declaración de atributos, funciones o principal")
