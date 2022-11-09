@@ -1,4 +1,4 @@
-from hashlib import new
+
 from re import I
 from tkinter import *
 from tkinter import ttk
@@ -17,11 +17,14 @@ tokens = []
 tipo_token = []
 lista_variables = []
 lista_funciones = []
+diccionarioVars = {
+    #KEY (VAR) : ['TIPO', 'VALOR' .... ] 
+}
 #Parte lógica______________________
 def cerrarF():
     root.destroy()
 
-def AnalisisSintactico(text):
+def AnalisisSintactico():
 
     #for ind in range (len(tokens)):
      #   if(tokens[ind] in builtIn):
@@ -70,6 +73,7 @@ def AnalisisSintactico(text):
                                     else:
                                         #El nombre de la variable es correcto, se añade a la lista de variables
                                         lista_variables.append(tokens[indice])
+                                        lista_variables.append(tipo_token[indice-1]) #Almacenamos el tipo de dato
                                         indice+=1
                                     if(tokens[indice] == "?"):
                                         indice+=1
@@ -157,26 +161,53 @@ def AnalisisSintactico(text):
                                 messagebox.showerror("Error",f"Error sintáctico, se esperaba inicio de declaración de una función '~'")
                                 break
                         indice+=1   
-                #EN CASO DE QUE SE VAYA A PRINCIPAL#
-                #------------------------------------------------#
-                #--------------SECCIÓN PRINCIPAL-----------------#
-                #------------------------------------------------#
+                #En caso de que se vaya a principal
                 if(tokens[indice] == "PRINCIPAL" and tipo_token[indice] == "Built-In Word"):
                     indice+=1
                     if(tokens[indice] == ":"):
                         indice+=1
                         #Todo código lógico aquí (Inicio del apartado principal) --->
-                        #ESCRIBIDO
-                        if(tokens[indice] == "ESCRIBIDO" and tipo_token[indice] == "Built-In Word"):
-                            indice+=1
-                            if(tokens[indice] == "("):
-                                indice+=1
-                                while(tokens[indice]!=")"):
-                                    if(tipo_token[indice] == "Cadena" or tipo_token[indice] == "Var"):
-                                        indice+=1
-                                    if(tokens[indice] == "+"):
-                                        indice+=1
 
+                        #ESCRIBIDO
+                        # if(tokens[indice] == "ESCRIBIDO" and tipo_token[indice] == "Built-In Word"):
+                        #     indice+=1
+                        #     if(tokens[indice] == "("):
+                        #         indice+=1
+                        #         while(tokens[indice]!=")"):
+                        #             if(tipo_token[indice] == "Cadena" or tipo_token[indice] == "Var"):
+                        #                 indice+=1
+                        #             if(tokens[indice] == "+"):
+                        #                 indice+=1
+                        
+                        #Analisis de las variables, existe, no existe y mismatch error
+                        if(tipo_token[indice] == "Var"):
+                            #Buscar en la lista de vars si existe
+                            if(tokens[indice] in lista_variables):
+                                #Seguir analizando el código
+                                #obtenemos la posición del elemento del token para posterior obtener su tipo de dato
+                                posiVar = 0
+                                for pV in range(len(lista_variables)):
+                                    if(lista_variables[pV] == tokens[indice]):
+                                        posiVar = pV
+                                        break
+                                    else:
+                                        continue
+                                tipoVar = str(lista_variables[posiVar+1])
+                                indice+=1
+                                if((tokens[indice] == "equ") and (tipo_token[indice] == "Asignación")):
+                                    indice+=1
+                                    #Comparativa para mismatch
+                                    if( ((tipoVar == "Var Entero") and (tipo_token[indice] == "Número")) or ((tipoVar == "Var Cadena") and (tipo_token[indice] == "Cadena")) or ((tipoVar == "Var Booleana") and (tipo_token[indice] == "Boolean")) ):
+                                        #Si coincide entonces avanza
+                                        indice+=1
+                                    #Aquí se podría agregar un elif() para hacer operaciones o al momento de recibir un dato con RECIBIDO
+                                    else:
+                                        messagebox.showerror("Error", f"Error semántico, mismatch error, variable '{tokens[indice-2]}' es de tipo {tipoVar} y se le asignó {tipo_token[indice]}")
+                                else:
+                                    messagebox.showerror("Error", f"Se esperaba palabra reservada 'equ' para asignación de valor a variable '{tokens[indice-1]}'")
+                            else:
+                                messagebox.showerror("Error", f"Error semántico, variable '{tokens[indice]}' no declarada previamente")
+                        
                     else:
                         messagebox.showerror("Error",f"Error de sintáxis, se esperaba ':' en, {tokens[indice-1]}, {tokens[indice]}")
                 else:
@@ -195,22 +226,8 @@ def AnalisisSintactico(text):
     return 0
 
 def getTextInput(cadena, tokens):
-    newWindow = Toplevel(root)
-    newWindow.title("Tabla de tokens")
-    newWindow.config(background="#334856")
-    newWindow.geometry(f"{700}x{300}+{200}+{30}")
-    #Creación de tabla______________________
-    columns = ('Num', 'Token', 'ID')
-    tree = ttk.Treeview(newWindow, columns=columns, show='headings')
-    tree.heading('Num', text='Num')
-    tree.heading('Token', text='Token')
-    tree.heading('ID', text='ID_String')
-
-    tree.grid(row=3, column=0)
-    scrollbar = ttk.Scrollbar(newWindow, orient=tkinter.VERTICAL, command=tree.yview)
-    tree.configure(yscroll=scrollbar.set)
-    scrollbar.grid(row=3, column=1, sticky='ns')
     bandera = True
+
     while(len(cadena) > 0 and bandera == True):
         token = ""       
         #primer caracter es númerico
@@ -222,7 +239,12 @@ def getTextInput(cadena, tokens):
                 i += 1
             token = cadena[0:i]
             cadena = cadena[i::]
-            tipo_token.append("Número")
+            if("." in cadena):
+                messagebox.showerror("Error", f"Error léxico, números decimales no disponibles")
+                bandera = False
+                break
+            else:
+                tipo_token.append("Número")
         #primer caracter es especial
         elif(cadena[0] in specialL):
             #espacios
@@ -306,15 +328,15 @@ def getTextInput(cadena, tokens):
             #Detectando tipo de operador
                 if(cadena[0] == "*"):
                     if(not token in operadoresA):
-                        print("Error léxico: " + token)#error léxico
+                        messagebox.showerror("Error", f"Error léxico {token}")#error léxico
                         bandera = False
                 elif(cadena[0] == "="):
                     if(not token in operadoresRL):
-                        print("Error léxico: " + token)#error léxico
+                        messagebox.showerror("Error", f"Error léxico {token}")#error léxico
                         bandera = False
                 elif(cadena[0] == "@"):
                     if(not token in tiposD):
-                        print("Error léxico: " + token)#error léxico
+                        messagebox.showerror("Error", f"Error léxico {token}")#error léxico
                         bandera = False
                 cadena = cadena[i::]
             #caracter especial
@@ -338,22 +360,27 @@ def getTextInput(cadena, tokens):
             cadena = cadena[i::]
             if(token in builtIn):
                 tipo_token.append("Built-In Word")
+            elif((token == "True") or (token == "False")):
+                tipo_token.append("Boolean")
             else:
                 tipo_token.append("Nombre de método o clase")
 
         if(token != ""):
             tokens.append(token)
    
-    #AnalisisSintactico()
+    AnalisisSintactico()
+
 #---------------------------------------------------------------------------------------------------------
     for items in range(len(tokens)):
         tree.insert('', tkinter.END, values=(items,tokens[items], tipo_token[items]))
+        
+    #result=textoComentario.get("1.0","end")
+    #print(result)
 
 #Creación de la raíz______________________
 root=Tk()
 root.config(background="#26292b")
-root.title("TEAM CODE")
-root.overrideredirect(0)
+root.overrideredirect(1)
 root.geometry(f"{750}x{650}+{200}+{30}")
 #Creación de Frame______________________
 Frame1=Frame(root, background="#26292b")
@@ -371,20 +398,26 @@ scrollVert=Scrollbar(Frame1, command=textoComentario.yview)
 scrollVert.grid(row=1,column=1, sticky="nsew")
 textoComentario.config(yscrollcommand=scrollVert.set)
 #Botones play______________________
-add=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T3\\PoyectoAnalizadorLSS-main\\play.png")
-botonañadir=Button(Frame1, image=add, width=24, height=24, command=lambda:AnalisisSintactico(textoComentario.get("1.0","end")))
+add=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\play.png")
+botonañadir=Button(Frame1, image=add, width=24, height=24, command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
 botonañadir.place(relx=0.9, rely=0.028, anchor=CENTER)
 #Botones cerrar______________________
-cerrar=PhotoImage(file="D:\\Archivos de programa\\Uni 7°\\Lenguajes y Autómatas 2\\T3\\PoyectoAnalizadorLSS-main\\cerrar.png")
+cerrar=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\cerrar.png")
 btncerrar=Button(Frame1, image=add, width=24, height=24,command=cerrarF)
 btncerrar.place(relx=0.978, rely=0.028, anchor=CENTER)
+#Creación de tabla______________________
+columns = ('Num', 'Token', 'ID')
+tree = ttk.Treeview(Frame1, columns=columns, show='headings')
+tree.heading('Num', text='Num')
+tree.heading('Token', text='Token')
+tree.heading('ID', text='ID_String')
 
-#-----------------Barra menú--------------------#
-barraMenu=Menu(root)
-root.config(menu=barraMenu, width=300, height=300)
-MenuLSS=Menu(barraMenu, tearoff=0)
-MenuLSS.add_command(label="Tabla de tokens", command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
-MenuLSS.add_command(label="Tabla de variables")
-barraMenu.add_cascade(label="Tablas", menu=MenuLSS)
+tree.grid(row=3, column=0)
+scrollbar = ttk.Scrollbar(Frame1, orient=tkinter.VERTICAL, command=tree.yview)
+tree.configure(yscroll=scrollbar.set)
+scrollbar.grid(row=3, column=1, sticky='ns')
+
+
+
 
 root.mainloop()
