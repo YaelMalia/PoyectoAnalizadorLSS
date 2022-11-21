@@ -166,7 +166,8 @@ def AnalisisSintactico():
                     indice+=1
                     if(tokens[indice] == ":"):
                         indice+=1
-                        #Todo código lógico aquí (Inicio del apartado principal) --->
+                        while(tokens[indice]!="FINPRINCIPAL_"):
+                              #Todo código lógico aquí (Inicio del apartado principal) --->
 
                         #ESCRIBIDO
                         # if(tokens[indice] == "ESCRIBIDO" and tipo_token[indice] == "Built-In Word"):
@@ -180,33 +181,39 @@ def AnalisisSintactico():
                         #                 indice+=1
                         
                         #Analisis de las variables, existe, no existe y mismatch error
-                        if(tipo_token[indice] == "Var"):
+                            if(tipo_token[indice] == "Var"):
                             #Buscar en la lista de vars si existe
-                            if(tokens[indice] in lista_variables):
+                                if(tokens[indice] in lista_variables):
                                 #Seguir analizando el código
                                 #obtenemos la posición del elemento del token para posterior obtener su tipo de dato
-                                posiVar = 0
-                                for pV in range(len(lista_variables)):
-                                    if(lista_variables[pV] == tokens[indice]):
-                                        posiVar = pV
-                                        break
-                                    else:
-                                        continue
-                                tipoVar = str(lista_variables[posiVar+1])
-                                indice+=1
-                                if((tokens[indice] == "equ") and (tipo_token[indice] == "Asignación")):
+                                    posiVar = 0
+                                    for pV in range(len(lista_variables)):
+                                        if(lista_variables[pV] == tokens[indice]):
+                                            posiVar = pV
+                                            break
+                                        else:
+                                            continue
+                                    tipoVar = str(lista_variables[posiVar+1])
                                     indice+=1
-                                    #Comparativa para mismatch
-                                    if( ((tipoVar == "Var Entero") and (tipo_token[indice] == "Número")) or ((tipoVar == "Var Cadena") and (tipo_token[indice] == "Cadena")) or ((tipoVar == "Var Booleana") and (tipo_token[indice] == "Boolean")) ):
-                                        #Si coincide entonces avanza
+                                    if((tokens[indice] == "equ") and (tipo_token[indice] == "Asignación")):
                                         indice+=1
+                                    #Comparativa para mismatch
+                                        if( ((tipoVar == "Var Entero") and (tipo_token[indice] == "Número")) or ((tipoVar == "Var Cadena") and (tipo_token[indice] == "Cadena")) or ((tipoVar == "Var Booleana") and (tipo_token[indice] == "Boolean")) ):
+                                        #Si coincide entonces avanza
+                                            indice+=1
+                                            if(tokens[indice] == "?"):
+                                                indice+=1
+                                            #Continua evaluando <---
+                                                messagebox.showinfo("AVISO","Sin errores :D")
+                                            else:
+                                                messagebox.showerror("Error", f"Se esperaba '?' en {tokens[indice-3]} {tokens[indice-2]} {tokens[indice-1]}")
                                     #Aquí se podría agregar un elif() para hacer operaciones o al momento de recibir un dato con RECIBIDO
+                                        else:
+                                            messagebox.showerror("Error", f"Error semántico, mismatch error, variable '{tokens[indice-2]}' es de tipo {tipoVar} y se le asignó {tipo_token[indice]}")
                                     else:
-                                        messagebox.showerror("Error", f"Error semántico, mismatch error, variable '{tokens[indice-2]}' es de tipo {tipoVar} y se le asignó {tipo_token[indice]}")
+                                        messagebox.showerror("Error", f"Se esperaba palabra reservada 'equ' para asignación de valor a variable '{tokens[indice-1]}'")
                                 else:
-                                    messagebox.showerror("Error", f"Se esperaba palabra reservada 'equ' para asignación de valor a variable '{tokens[indice-1]}'")
-                            else:
-                                messagebox.showerror("Error", f"Error semántico, variable '{tokens[indice]}' no declarada previamente")
+                                    messagebox.showerror("Error", f"Error semántico, variable '{tokens[indice]}' no declarada previamente")
                         
                     else:
                         messagebox.showerror("Error",f"Error de sintáxis, se esperaba ':' en, {tokens[indice-1]}, {tokens[indice]}")
