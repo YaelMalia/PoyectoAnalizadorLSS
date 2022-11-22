@@ -236,7 +236,7 @@ def AnalisisSintactico(text):
 #-----------------------------------------------------------------------------------------#
 #--------------------------------------TOKENIZADOR----------------------------------------#
 #-----------------------------------------------------------------------------------------#
-def getTextInput(cadena, tokens):
+def getTextInput(cadena, tokens, tipo_token):
     newWindow = Toplevel(root)
     newWindow.title("Tabla de tokens")
     newWindow.config(background="#334856")
@@ -396,8 +396,13 @@ def getTextInput(cadena, tokens):
         if(token != ""):
             tokens.append(token)  
     #AnalisisSintactico()
+        
     for items in range(len(tokens)):
         tree.insert('', tkinter.END, values=(items,tokens[items], tipo_token[items]))
+    
+    tokens.clear()
+    tipo_token.clear()
+    
 #-----------------------------------------------------------------------------------------#
 #-----------------------------------Creación de la raíz-----------------------------------#
 #-----------------------------------------------------------------------------------------#
@@ -435,7 +440,7 @@ btncerrar.place(relx=0.978, rely=0.028, anchor=CENTER)
 barraMenu=Menu(root)
 root.config(menu=barraMenu, width=300, height=300)
 MenuLSS=Menu(barraMenu, tearoff=0)
-MenuLSS.add_command(label="Tabla de tokens", command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens))
+MenuLSS.add_command(label="Tabla de tokens", command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens,tipo_token))
 MenuLSS.add_command(label="Tabla de variables")
 barraMenu.add_cascade(label="Tablas", menu=MenuLSS)
 
