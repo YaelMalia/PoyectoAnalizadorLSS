@@ -17,14 +17,15 @@ tokens = []
 tipo_token = []
 lista_variables = []
 lista_funciones = []
+
 diccionarioVars = {
-    #KEY (VAR) : ['TIPO', 'VALOR' .... ] 
+    #KEY (VAR) : {'TIPO', 'VALOR' .... }
 }
 #Parte lógica______________________
 def cerrarF():
     root.destroy()
 
-def AnalisisSintactico(text):
+def AnalisisSintactico():
 
     #for ind in range (len(tokens)):
      #   if(tokens[ind] in builtIn):
@@ -73,7 +74,10 @@ def AnalisisSintactico(text):
                                     else:
                                         #El nombre de la variable es correcto, se añade a la lista de variables
                                         lista_variables.append(tokens[indice])
+                                        diccionarioVars[tokens[indice]] = {"tipoDato": "", "valor": "", "resoluble": ""}
                                         lista_variables.append(tipo_token[indice-1]) #Almacenamos el tipo de dato
+                                        diccionarioVars[tokens[indice]]["tipoDato"] = tipo_token[indice-1]
+                                        
                                         indice+=1
                                     if(tokens[indice] == "?"):
                                         indice+=1
@@ -182,6 +186,7 @@ def AnalisisSintactico(text):
                         
                         #Analisis de las variables, existe, no existe y mismatch error
                             if(tipo_token[indice] == "Var"):
+                                mivar = indice
                             #Buscar en la lista de vars si existe
                                 if(tokens[indice] in lista_variables):
                                 #Seguir analizando el código
@@ -202,7 +207,10 @@ def AnalisisSintactico(text):
                                         #Si coincide entonces avanza
                                             indice+=1
                                             if(tokens[indice] == "?"):
+                                                diccionarioVars[tokens[mivar]]["valor"] = tokens[indice-1]
                                                 indice+=1
+                                                print(diccionarioVars)
+
                                             #Continua evaluando <---
                                                 messagebox.showinfo("AVISO","Sin errores :D")
                                             else:
@@ -252,7 +260,6 @@ def getTextInput(cadena, tokens, tipo_token):
     scrollbar = ttk.Scrollbar(newWindow, orient=tkinter.VERTICAL, command=tree.yview)
     tree.configure(yscroll=scrollbar.set)
     scrollbar.grid(row=3, column=1, sticky='ns')
-
 
     bandera = True
 
@@ -395,7 +402,7 @@ def getTextInput(cadena, tokens, tipo_token):
 
         if(token != ""):
             tokens.append(token)  
-    #AnalisisSintactico()
+    AnalisisSintactico()
         
     for items in range(len(tokens)):
         tree.insert('', tkinter.END, values=(items,tokens[items], tipo_token[items]))
@@ -428,7 +435,7 @@ scrollVert.grid(row=1,column=1, sticky="nsew")
 textoComentario.config(yscrollcommand=scrollVert.set)
 #Botones play______________________
 #add=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\play.png")
-botonañadir=Button(Frame1, text="P", command=lambda:AnalisisSintactico(textoComentario.get("1.0","end")))
+botonañadir=Button(Frame1, text="P", command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens,tipo_token))
 botonañadir.place(relx=0.9, rely=0.028, anchor=CENTER)
 #Botones cerrar______________________
 #cerrar=PhotoImage(file="C:\\Users\\yaelc\\Desktop\\Semestre 7\\Lenguajes Automatas 2\\compilador\\Tokenizer\\Proyectofinal\\cerrar.png")
