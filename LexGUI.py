@@ -202,7 +202,7 @@ def AnalisisSintactico():
                                     indice+=1
                                     if((tokens[indice] == "equ") and (tipo_token[indice] == "Asignación")):
                                         indice+=1
-                                    #Comparativa para mismatch
+                                        #Comparativa para mismatch
                                         if( ((tipoVar == "Var Entero") and (tipo_token[indice] == "Número")) or ((tipoVar == "Var Cadena") and (tipo_token[indice] == "Cadena")) or ((tipoVar == "Var Booleana") and (tipo_token[indice] == "Boolean")) ):
                                         #Si coincide entonces avanza
                                             indice+=1
@@ -215,7 +215,18 @@ def AnalisisSintactico():
                                                 messagebox.showinfo("AVISO","Sin errores :D")
                                             else:
                                                 messagebox.showerror("Error", f"Se esperaba '?' en {tokens[indice-3]} {tokens[indice-2]} {tokens[indice-1]}")
-                                    #Aquí se podría agregar un elif() para hacer operaciones o al momento de recibir un dato con RECIBIDO
+                                        #Aquí se podría agregar un elif() para hacer operaciones o al momento de recibir un dato con RECIBIDO
+                                        elif(tipoVar == "Var Entero"):
+                                            if( (tokens[indice] == "*MAS") or (tokens[indice] == "*MENOS") or (tokens[indice] == "*MULT") or (tokens[indice] == "*DIV") ):
+                                                indice+=1
+                                                if(tokens[indice] == "("):
+                                                    indice+=1
+                                                    if(tokens[indice].isdigit()):
+                                                        indice+=1
+                                                    else:
+                                                        messagebox.showerror("Error", f"Error semántico, se esperaba operador aritmético para variable {tokens[indice-2]} entera")
+                                            else:
+                                                messagebox.showerror("Error", f"Se esperaba una operación de tipo entera")
                                         else:
                                             messagebox.showerror("Error", f"Error semántico, mismatch error, variable '{tokens[indice-2]}' es de tipo {tipoVar} y se le asignó {tipo_token[indice]}")
                                     else:
@@ -245,21 +256,6 @@ def AnalisisSintactico():
 #--------------------------------------TOKENIZADOR----------------------------------------#
 #-----------------------------------------------------------------------------------------#
 def getTextInput(cadena, tokens, tipo_token):
-    newWindow = Toplevel(root)
-    newWindow.title("Tabla de tokens")
-    newWindow.config(background="#334856")
-    newWindow.geometry(f"{700}x{300}+{200}+{30}")
-    #Creación de tabla______________________
-    columns = ('Num', 'Token', 'ID')
-    tree = ttk.Treeview(newWindow, columns=columns, show='headings')
-    tree.heading('Num', text='Num')
-    tree.heading('Token', text='Token')
-    tree.heading('ID', text='ID_String')
-
-    tree.grid(row=3, column=0)
-    scrollbar = ttk.Scrollbar(newWindow, orient=tkinter.VERTICAL, command=tree.yview)
-    tree.configure(yscroll=scrollbar.set)
-    scrollbar.grid(row=3, column=1, sticky='ns')
 
     bandera = True
 
@@ -404,6 +400,23 @@ def getTextInput(cadena, tokens, tipo_token):
             tokens.append(token)  
     AnalisisSintactico()
         
+def crearTablaTokens(tokens, tipo_token):
+    newWindow = Toplevel(root)
+    newWindow.title("Tabla de tokens")
+    newWindow.config(background="#334856")
+    newWindow.geometry(f"{700}x{300}+{200}+{30}")
+    #Creación de tabla________
+    columns = ('Num', 'Token', 'ID')
+    tree = ttk.Treeview(newWindow, columns=columns, show='headings')
+    tree.heading('Num', text='Num')
+    tree.heading('Token', text='Token')
+    tree.heading('ID', text='ID_String')
+
+    tree.grid(row=3, column=0)
+    scrollbar = ttk.Scrollbar(newWindow, orient=tkinter.VERTICAL, command=tree.yview)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.grid(row=3, column=1, sticky='ns')
+
     for items in range(len(tokens)):
         tree.insert('', tkinter.END, values=(items,tokens[items], tipo_token[items]))
     
@@ -447,7 +460,7 @@ btncerrar.place(relx=0.978, rely=0.028, anchor=CENTER)
 barraMenu=Menu(root)
 root.config(menu=barraMenu, width=300, height=300)
 MenuLSS=Menu(barraMenu, tearoff=0)
-MenuLSS.add_command(label="Tabla de tokens", command=lambda:getTextInput(textoComentario.get("1.0","end"),tokens,tipo_token))
+MenuLSS.add_command(label="Tabla de tokens", command=lambda:crearTablaTokens(tokens,tipo_token))
 MenuLSS.add_command(label="Tabla de variables")
 barraMenu.add_cascade(label="Tablas", menu=MenuLSS)
 
